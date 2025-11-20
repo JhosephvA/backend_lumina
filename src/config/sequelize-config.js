@@ -1,20 +1,14 @@
 const { Sequelize } = require('sequelize');
 
-// Solo cargar dotenv si estás en local
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-  console.log('📦 Variables cargadas desde .env (local)');
-}
-
-// Construir URL de conexión desde variables de Railway
 const connectionUrl =
-  process.env.MYSQL_URL || // URL completa
-  (process.env.MYSQLUSER &&
-    process.env.MYSQLPASSWORD &&
-    process.env.MYSQLHOST &&
-    process.env.MYSQLPORT &&
-    process.env.MYSQLDATABASE
-      ? `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}@${process.env.MYSQLHOST}:${process.env.MYSQLPORT}/${process.env.MYSQLDATABASE}`
+  process.env.DB_URL ||
+  process.env.MYSQL_URL ||
+  (process.env.MYSQL_USER &&
+   process.env.MYSQL_PASSWORD &&
+   process.env.MYSQL_HOST &&
+   process.env.MYSQL_PORT &&
+   process.env.MYSQL_DATABASE
+      ? `mysql://${process.env.MYSQL_USER}:${process.env.MYSQL_PASSWORD}@${process.env.MYSQL_HOST}:${process.env.MYSQL_PORT}/${process.env.MYSQL_DATABASE}`
       : null);
 
 console.log("Connection URL usada:", connectionUrl);
@@ -26,7 +20,7 @@ if (!connectionUrl) {
 
 const sequelize = new Sequelize(connectionUrl, {
   dialect: 'mysql',
-  logging: false,
+  logging: console.log,
   dialectOptions: {
     ssl: {
       require: true,
