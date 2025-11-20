@@ -1,35 +1,33 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
 
-// Construir la URL de conexión usando variables de Railway
-const {
-  MYSQL_USER,
-  MYSQL_PASSWORD,
-  MYSQL_HOST,
-  MYSQL_PORT,
-  MYSQL_DATABASE
-} = process.env;
+// Railway injecta variables directamente
+const user = process.env.MYSQL_USER || process.env.MYSQLUSER;
+const password = process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD;
+const host = process.env.MYSQL_HOST || process.env.MYSQLHOST;
+const port = process.env.MYSQL_PORT || process.env.MYSQLPORT;
+const database = process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE;
+const dialect = process.env.DB_DIALECT || 'mysql';
 
-// Validar que existan todas las variables necesarias
-if (!MYSQL_USER || !MYSQL_PASSWORD || !MYSQL_HOST || !MYSQL_PORT || !MYSQL_DATABASE) {
+if (!user || !password || !host || !port || !database) {
   console.error("==== DEBUG VARIABLES ENTORNO ====");
-  console.log("MYSQL_USER:", MYSQL_USER);
-  console.log("MYSQL_PASSWORD:", MYSQL_PASSWORD);
-  console.log("MYSQL_HOST:", MYSQL_HOST);
-  console.log("MYSQL_PORT:", MYSQL_PORT);
-  console.log("MYSQL_DATABASE:", MYSQL_DATABASE);
-  console.log("=================================");
-  throw new Error('❌ No se encontró alguna variable de entorno de la base de datos en Railway.');
+  console.log("MYSQL_USER:", process.env.MYSQL_USER);
+  console.log("MYSQL_PASSWORD:", process.env.MYSQL_PASSWORD);
+  console.log("MYSQL_HOST:", process.env.MYSQL_HOST);
+  console.log("MYSQL_PORT:", process.env.MYSQL_PORT);
+  console.log("MYSQL_DATABASE:", process.env.MYSQL_DATABASE);
+  console.log("MYSQLUSER:", process.env.MYSQLUSER);
+  console.log("MYSQLPASSWORD:", process.env.MYSQLPASSWORD);
+  console.log("MYSQLHOST:", process.env.MYSQLHOST);
+  console.log("MYSQLPORT:", process.env.MYSQLPORT);
+  console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+  throw new Error('❌ No se encontró ninguna variable de entorno para la base de datos.');
 }
 
-// Construir la URL de conexión completa
-const connectionUrl = `mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}`;
-
-console.log("Conectando a DB con:", connectionUrl);
-
-const sequelize = new Sequelize(connectionUrl, {
-  dialect: 'mysql',
-  logging: console.log, // puedes poner false si no quieres logs
+const sequelize = new Sequelize(database, user, password, {
+  host,
+  port,
+  dialect,
+  logging: false,
   dialectOptions: {
     ssl: {
       require: true,
@@ -37,5 +35,7 @@ const sequelize = new Sequelize(connectionUrl, {
     },
   },
 });
+
+console.log("✅ Conexión configurada con éxito a la base de datos.");
 
 module.exports = sequelize;
