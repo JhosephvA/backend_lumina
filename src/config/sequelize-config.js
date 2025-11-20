@@ -1,37 +1,15 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// -----------------------------
-// Intentar leer la URL completa primero
-// -----------------------------
-let connectionUrl = process.env.DB_URL;
+// Usar DB_URL, que Railway garantiza que existe
+const connectionUrl = process.env.DB_URL || process.env.MYSQL_URL;
 
-// -----------------------------
-// Si DB_URL no está definida, usar variables separadas
-// -----------------------------
 if (!connectionUrl) {
-  const {
-    MYSQL_DATABASE,
-    MYSQLUSER,
-    MYSQLPASSWORD,
-    MYSQLHOST,
-    MYSQLPORT,
-    DB_DIALECT
-  } = process.env;
-
-  if (!MYSQL_DATABASE || !MYSQLUSER || !MYSQLPASSWORD || !MYSQLHOST || !MYSQLPORT) {
-    throw new Error(
-      'Las variables de entorno necesarias para la base de datos no están definidas.'
-    );
-  }
-
-  connectionUrl = `${DB_DIALECT || 'mysql'}://${MYSQLUSER}:${MYSQLPASSWORD}@${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}`;
+  throw new Error('La variable de entorno DB_URL no está definida.');
 }
 
-// -----------------------------
-// Debug: imprimir la URL para verificar
-// -----------------------------
-console.log("DB_URL final:", connectionUrl);
+// Debug opcional
+console.log("Conectando a DB con:", connectionUrl);
 
 const sequelize = new Sequelize(connectionUrl, {
   dialect: process.env.DB_DIALECT || 'mysql',
@@ -39,7 +17,7 @@ const sequelize = new Sequelize(connectionUrl, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // necesario para conexiones remotas como Railway
+      rejectUnauthorized: false,
     },
   },
 });
