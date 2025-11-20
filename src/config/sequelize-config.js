@@ -1,18 +1,19 @@
-// sequelize-config.js
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Usar la URL interna de Railway para conexiones dentro de la misma red
-const connectionUrl = process.env.DB_URL;
+if (!process.env.DB_URL) {
+  throw new Error('La variable de entorno DB_URL no está definida.');
+}
 
-const sequelize = new Sequelize(connectionUrl, {
+const sequelize = new Sequelize(process.env.DB_URL, {
+  dialect: process.env.DB_DIALECT || 'mysql',
+  logging: false,
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // importante para conexiones remotas seguras
+      rejectUnauthorized: false,
     },
   },
-  logging: false, // desactiva logs SQL
 });
 
 module.exports = sequelize;
