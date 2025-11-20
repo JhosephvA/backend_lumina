@@ -1,6 +1,9 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// Debug: imprimir la URL para ver si Railway la está pasando correctamente
+console.log("DB_URL:", process.env.DB_URL);
+
 const connectionUrl = process.env.DB_URL;
 
 if (!connectionUrl) {
@@ -13,7 +16,7 @@ const sequelize = new Sequelize(connectionUrl, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false,
+      rejectUnauthorized: false, // necesario para conexiones remotas
     },
   },
 });
