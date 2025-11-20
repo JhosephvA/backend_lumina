@@ -1,11 +1,13 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-if (!process.env.DB_URL) {
-  throw new Error('La variable de entorno DB_URL no está definida.');
+const connectionUrl = process.env.DB_URL || process.env.MYSQL_PUBLIC_URL || process.env.MYSQL_URL;
+
+if (!connectionUrl) {
+  throw new Error('No se encontró ninguna URL de conexión a la base de datos.');
 }
 
-const sequelize = new Sequelize(process.env.DB_URL, {
+const sequelize = new Sequelize(connectionUrl, {
   dialect: process.env.DB_DIALECT || 'mysql',
   logging: false,
   dialectOptions: {
